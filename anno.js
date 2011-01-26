@@ -121,28 +121,25 @@ function annoShow(event) {
   return 0;
 }
 function annotateToc() {
-  var i,
-  addMarker = function (annoType, symbol) {
-    var E,
-      nodeList = document.getElementsByClassName(annoType);
-    for (i = 0; i < nodeList.length; i = i + 1) {
-      if (nodeList[i].offsetHeight !== 0) {
+  function addMarker(annoType, symbol) {
+    var E, i,
+      xPathResult = document.evaluate( '//b[contains(@class, \''+annoType+'\')]', document.body, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null );
+    for (var i = 0, node, tocel; i < xPathResult.snapshotLength; i++) {
+      node = xPathResult.snapshotItem(i);
+      if (node.offsetHeight !== 0 && (tocel = document.getElementById(node.parentNode.id + "-toc"))) {
         E = document.createElement("span");
         E.setAttribute("class", "toc-anno");
         E.textContent = symbol;
-        document.getElementById(nodeList[i].parentNode.id + "-toc").parentNode.firstChild.appendChild(E);
+        tocel.parentNode.firstChild.appendChild(E);
       }
     }
   };
   addMarker("erra", "\u24ba");
   addMarker("rev1", "\u2460");
   addMarker("anno", "\u24b6");
-  addMarker("mdcr", "\u24c7");
-  addMarker("mdcg", "\u24bc");
-  addMarker("dmas", "\u24b9");
 }
 function annotateHeadings(baseUrl, marker, className, annos) {
-  var element, hyperlink, i, id, space;
+  var element, hyperlink, i, id, space, tocel;
   for (id in annos) {
     if (id !== null && id !== undefined) {
       element = document.getElementById(id);
@@ -156,6 +153,12 @@ function annotateHeadings(baseUrl, marker, className, annos) {
         hyperlink.textContent = marker;
         element.appendChild(space);
         element.appendChild(hyperlink);
+        if( tocel=document.getElementById( id+'-toc' ) ){
+          var E = document.createElement("span");
+          E.setAttribute("class", "toc-anno");
+          E.textContent = marker;
+          tocel.parentNode.firstChild.appendChild(E);
+        }
       }
     }
   }
